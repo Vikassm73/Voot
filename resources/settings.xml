@@ -1,20 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <category label="Language Selection">
-        <setting id="bn" type="bool" label="Bengali?" default="true" />
-        <setting id="en" type="bool" label="English?" default="true" />
-        <setting id="gu" type="bool" label="Gujarathi?" default="true" />
-        <setting id="hi" type="bool" label="Hindi?" default="true" />
-        <setting id="kn" type="bool" label="Kannada?" default="true" />
-        <setting id="ml" type="bool" label="Malayalam?" default="true" />
-        <setting id="mr" type="bool" label="Marathi?" default="true" />
-        <setting id="ta" type="bool" label="Tamil?" default="true" />
-        <setting id="te" type="bool" label="Telugu?" default="true" />
-        <setting id="pa" type="bool" label="Punjabi?" default="true" />
-    </category>
-
-    <category label="General">
-        <setting id="debug" type="bool" label="Enable Debug Logs?" default="false" />
-    </category>
-
+	<category label="Options">
+	<setting id="tvsort" type="labelenum" label="TV Shows sorting by" values="Popularity|Name" default="Popularity" />
+	<setting id="msort" type="labelenum" label="Movies sorting by" values="Popularity|Name" default="Popularity" />
+	<setting id="quality" type="enum" label="Video Quality Selection" values="SD|HD (720p)|FHD (1080p)" default="0"/>
+	<setting type="sep" />
+	<setting id="timeout" type="number" label="Cache Timeout in hours" default="6"/> 
+	<setting type="lsep" label="Usage outside India requires VPN or IP Address configured below"/>
+	<setting id="EnableIP" type="bool" label="Enable Indian IP address?" default="false" />
+	<setting id="ipaddress" type="ipaddress" label="any Indian IP address (http://bit.ly/1LhsHMX)" enable="!eq(-1,false)" default="0.0.0.0"/>
+	</category>
 </settings>
