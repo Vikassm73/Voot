@@ -25,6 +25,7 @@ import xbmcaddon
 import re
 import requests
 import math
+import web_pdb
 try:
     import StorageServer
 except:
@@ -93,6 +94,7 @@ def get_langs():
     :return: list
     """
     languages = ['Hindi','Marathi','Telugu','Kannada','Bengali','Gujarati','Tulu']
+    #web_pdb.set_trace()
     langs = []
     for item in languages:
         url = '%svoot-web/content/generic/movies-by-language?language=include:%s&sort=title:asc,mostpopular:desc&responseType=common'%(apiUrl,item)
@@ -112,7 +114,7 @@ def get_channels(offSet):
     channels = []
     finalpg = True
     url = '%svoot-web/content/specific/editorial?query=include:0657ce8613bb205d46dd8f3c5e7df829&responseType=common&page=%s'%(apiUrl,offSet)
-
+    #web_pdb.set_trace()
     jd = requests.get(url,headers=headers).json()
     items = jd['result']
     for item in items:
@@ -146,7 +148,7 @@ def get_shows(offSet,channel,totals):
     Get the list of shows.
     :return: list
     """
-
+    #web_pdb.set_trace()
     shows = []
     finalpg = True
     url = '%svoot-web/content/generic/shows-by-sbu?sbu=include:%s&sort=mostpopular:desc&&page=%s'%(apiUrl,channel,offSet)
@@ -169,7 +171,7 @@ def get_shows(offSet,channel,totals):
     offSet = int(offSet)
     totals = int(jd['totalAsset'])
     itemsLeft = totals - offSet * 10
-
+    #web_pdb.set_trace()
     if itemsLeft > 0:
         finalpg = False
         pages = int(math.ceil(totals/10.0))
@@ -189,7 +191,7 @@ def get_season(show,offSet,totals):
     :return: list
     """
     season = []
-
+    #web_pdb.set_trace()
     finalpg = True
     url = '%svoot-web/content/generic/season-by-show?sort=season:desc&id=%s&page=%s&responseType=common'%(apiUrl,show,offSet)
 
@@ -213,7 +215,7 @@ def get_season(show,offSet,totals):
     offSet = int(offSet)
     totals = int(totals)
     itemsLeft = totals - offSet * 10
-
+    #web_pdb.set_trace()
     if itemsLeft > 0:
         finalpg = False
         pages = int(math.ceil(totals/10.0))
@@ -235,7 +237,7 @@ def get_episodes(show,offSet):
     """
     episodes = []
     url = '%svoot-web/content/generic/series-wise-episode?sort=episode:desc&id=%s&&page=%s&responseType=common'%(apiUrl,show,offSet)
-
+    #web_pdb.set_trace()
     jd = requests.get(url,headers=headers).json()
     totals = jd['totalAsset']
     finalpg = True 
@@ -270,7 +272,7 @@ def get_episodes(show,offSet):
     offSet = int(offSet)
     totals = int(totals)
     itemsLeft = totals - offSet * 10
-
+    #web_pdb.set_trace()
     if itemsLeft > 0:
         finalpg = False
         pages = int(math.ceil(totals/10.0))
@@ -302,7 +304,7 @@ def get_movies(lang,offSet,totals):
     url = '%svoot-web/content/generic/movies-by-language?language=include:%s&page=%s&sort=mostpopular:desc&responseType=common'%(apiUrl,lang,offSet)
     jd = requests.get(url,headers=headers).json()        
     items = jd['result']
-
+    #web_pdb.set_trace()
     for item in items:
         title = item.get('name')
         mid = item.get('id')
@@ -382,6 +384,7 @@ def list_shows(offSet,channel,totals):
     """
     Create the list of channels in the Kodi interface.
     """
+    #web_pdb.set_trace()
     shows = cache.cacheFunction(get_shows,offSet,channel,totals)
     listing = []
     for title,icon,sid,item_id,tcount,labels in shows:
@@ -411,6 +414,7 @@ def list_season(show,offSet,totals):
     """
     Create the list of episodes in the Kodi interface.
     """
+    #web_pdb.set_trace()
     season = cache.cacheFunction(get_season,show,offSet,totals)
     listing = []
     for title,icon,sid,item_id,labels,tcount in season:
@@ -435,6 +439,7 @@ def list_episodes(show,offSet,sicon):
     """
     Create the list of episodes in the Kodi interface.
     """
+    #web_pdb.set_trace()
     episodes = cache.cacheFunction(get_episodes,show,offSet)
     listing = []
     for title,icon,eid,labels,totals in episodes:
@@ -530,6 +535,7 @@ def play_video(path, strqual):
     if _settings('EnableIP') == 'true':
         stream_url += '&X-Forwarded-For=%s'%_settings('ipaddress')
 
+    #web_pdb.set_trace()
     play_item.setPath(stream_url)
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
