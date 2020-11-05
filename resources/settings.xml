@@ -1,12 +1,16 @@
 <settings>
 	<category label="Options">
-	<setting id="tvsort" type="labelenum" label="TV Shows sorting by" values="Popularity|Name" default="Popularity" />
-	<setting id="msort" type="labelenum" label="Movies sorting by" values="Popularity|Name" default="Popularity" />
-	<setting id="quality" type="enum" label="Video Quality Selection" values="SD|HD (720p)|FHD (1080p)" default="0"/>
-	<setting type="sep" />
-	<setting id="timeout" type="number" label="Cache Timeout in hours" default="6"/> 
-	<setting type="lsep" label="Usage outside India requires VPN or IP Address configured below"/>
-	<setting id="EnableIP" type="bool" label="Enable Indian IP address?" default="false" />
-	<setting id="ipaddress" type="ipaddress" label="any Indian IP address (http://bit.ly/1LhsHMX)" enable="!eq(-1,false)" default="0.0.0.0"/>
+		<setting id="tvsort" type="labelenum" label="TV Shows sorting by" values="Popularity|Name" default="Popularity" />
+		<setting id="msort" type="labelenum" label="Movies sorting by" values="Popularity|Name" default="Popularity" />
+		<setting id="quality" type="enum" label="Video Quality Selection" values="SD|HD (720p)|FHD (1080p)" default="0"/>
+		<setting type="sep" />
+		<setting id="timeout" type="number" label="Cache Timeout in hours" default="6"/> 
+		<setting type="lsep" label="Usage outside India requires VPN or IP Address configured below"/>
+		<setting id="EnableIP" type="bool" label="Enable Indian IP address?" default="false" />
+		<setting id="ipaddress" type="ipaddress" label="any Indian IP address (http://bit.ly/1LhsHMX)" enable="!eq(-1,false)" default="0.0.0.0"/>
 	</category>
+	<category label="Login">
+		<setting id="email" type="text" label="email" default=""/>
+		<setting id="password" type="text" option="hidden"  label="password" default=""/>
+	</category>	
 </settings>
