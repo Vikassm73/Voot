@@ -62,6 +62,7 @@
       </Representation>
     </AdaptationSet>
     <AdaptationSet mimeType="audio/mp4" lang="und" segmentAlignment="0">
+      <SegmentTemplate timescale="48000" media="" initialization="show_sab_taarakmehtakaooltahchashmah_ep2897_64k_20201012T190344init.mp4" startNumber="1"/>
       <Representation id="8" bandwidth="64000" audioSamplingRate="48000" codecs="mp4a.40.2">
         <SegmentTemplate media="show_sab_taarakmehtakaooltahchashmah_ep2897_64k_20201012T190344_$Number%09d$.mp4" initialization="show_sab_taarakmehtakaooltahchashmah_ep2897_64k_20201012T190344init.mp4" startNumber="1">
           <SegmentTimeline>
