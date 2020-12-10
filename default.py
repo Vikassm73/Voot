@@ -55,7 +55,7 @@ def router(paramstring):
         elif params['action'] == 'list_extra':
             main.list_extra(params['offSet'])
         elif params['action'] == 'play':
-            main.play_video(params['video'], strqual)
+            main.play_video(params['video'],params['quality'] )
         elif params['action'] == 'Live':
             main.list_live(params['offSet'])
     else:

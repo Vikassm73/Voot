@@ -77,8 +77,10 @@ headers = { #"User-Agent": "okhttp/3.4.1",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
             "accept": "application/json, text/plain, */*",
             "accept-encoding": "gzip, deflate, br",
-            "content-type": "application/json;charset=UTF-8",
+            "content-type": "application/json; charset=utf-8",
             "referer": "https://www.voot.com/",
+           	"usertype": "svod",
+           	"Content-Version": "V4",
             "origin":"https://www.voot.com"
           }
 
@@ -130,23 +132,23 @@ def get_langs():
 
 
 def getlicense(id):
-
-    hdr = { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
-            "content-type": "application/json",
-            "authority": "rest-as.ott.kaltura.com",
-            "accept-encoding": "gzip, deflate, br",
-            "referer": "https://www.voot.com/",
-            "origin":"https://www.voot.com"
-          }
-    url = "https://rest-as.ott.kaltura.com/v4_4/api_v3/service/multirequest"
-    #web_pdb.set_trace()
     token=""
     if headers.get('ks'):
+        hdr = { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36",
+                "content-type": "application/json",
+                "authority": "rest-as.ott.kaltura.com",
+                "accept-encoding": "gzip, deflate, br",
+                "referer": "https://www.voot.com/",
+                "origin":"https://www.voot.com"
+              }
+        url = "https://rest-as.ott.kaltura.com/v4_4/api_v3/service/multirequest"
+        #web_pdb.set_trace()   
+
         body = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":headers['ks']},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK"},"ks":headers['ks']},"apiVersion":"5.2.6","ks":headers['ks'],"partnerId":225}
         body = dumps(body)
         jd = requests.post(url,headers=hdr,data=body).json()
         for lictoken in jd['result'][1]['sources']:
-            if lictoken.get('type') == 'DASH_LINEAR_APP':
+            if lictoken.get('type') == 'DASH_LINEAR_APP' or lictoken.get('type') == 'DASHENC_PremiumHD':
                 token=lictoken['drm'][1]['licenseURL']
     return token
 
@@ -159,7 +161,7 @@ def get_channels(offSet):
     finalpg = True
 
     url = '%svoot-web/content/specific/editorial?query=include:0657ce8613bb205d46dd8f3c5e7df829&responseType=common&page=%s'%(apiUrl,offSet)
-
+    #web_pdb.set_trace()
     jd = requests.get(url,headers=headers).json()
     items = jd['result']
     for item in items:
@@ -196,22 +198,41 @@ def get_shows(offSet,channel,totals):
     #web_pdb.set_trace()
     shows = []
     finalpg = True
-    url = '%svoot-web/content/generic/shows-by-sbu?sbu=include:%s&sort=mostpopular:desc&&page=%s'%(apiUrl,channel,offSet)
-    jd = requests.get(url,headers=headers).json()        
-    items = jd['result']
-    for item in items:
-        title = item.get('name')
-        tcount = item['meta'].get('season') if item['meta'].get('season') else 1
-        sbu = item['meta'].get('SBU')
-        item_id= item.get('id')
-        icon = item['details']['image'].get('base')+item['details']['image'].get('id')+'.'+item['details']['image'].get('type')
-        labels = {'title': title,
-                  'genre': item['meta'].get('genre'),
-                  'season': item['meta'].get('season'),
-                  'plot': item['meta']['synopsis'].get('full'),
-                  'mediatype': 'tvshow',
-                  'year': item['meta'].get('releaseYear')}                     
-        shows.append((title,icon,sbu,item_id,tcount,labels))
+    # 
+    if channel=='VSO':
+		url = '%svoot-web/content/specific/editorial-clone?query=include:366ef23c7cac2b3d5c7b315744f12a8b&&page=%s&responseType=common'%(apiUrl,offSet)
+		jd = requests.get(url,headers=headers).json()
+		items = jd['result']
+		for item in items:
+			title = item.get('name')
+			tcount = item.get('season') if item.get('season') else 1
+			sbu = item.get('SBU')
+			item_id= item.get('id')
+			icon = 'https://v3img.voot.com/resizeMedium,w_451,h_275/'+item['showImage']
+			labels = {'title': title,
+			          'genre': item.get('genres'),
+			          'season': item.get('season'),
+			          'plot': item['fullSynopsis'],
+			          'mediatype': 'tvshow',
+			          'year': item['releaseYear']}                     
+			shows.append((title,icon,sbu,item_id,tcount,labels))
+    else:
+		url = '%svoot-web/content/generic/shows-by-sbu?sbu=include:%s&sort=mostpopular:desc&&page=%s'%(apiUrl,channel,offSet)
+		jd = requests.get(url,headers=headers).json()        
+		items = jd['result']
+		for item in items:
+			title = item.get('name')
+			tcount = item['meta'].get('season') if item['meta'].get('season') else 1
+			sbu = item['meta'].get('SBU')
+			item_id= item.get('id')
+			icon = item['details']['image'].get('base')+item['details']['image'].get('id')+'.'+item['details']['image'].get('type')
+			labels = {'title': title,
+			          'genre': item['meta'].get('genre'),
+			          'season': item['meta'].get('season'),
+			          'plot': item['meta']['synopsis'].get('full'),
+			          'mediatype': 'tvshow',
+			          'year': item['meta'].get('releaseYear')}                     
+			shows.append((title,icon,sbu,item_id,tcount,labels))
 
     offSet = int(offSet)
     totals = int(jd['totalAsset'])
@@ -386,17 +407,18 @@ def get_movies(lang,offSet,totals):
     """
     Get the list of movies.
     :return: list
+    title:asc,
     """
     movies = []
     totals = int(totals)
     offSet = int(offSet)
     finalpg = True
-    itemsLeft = totals - (offSet+1) * 10
+    itemsLeft = totals - (offSet) * 10
     if itemsLeft > 0:
         finalpg = False
         pages = int(math.ceil(totals/10.0))
 
-    url = '%svoot-web/content/generic/movies-by-language?language=include:%s&page=%s&sort=mostpopular:desc&responseType=common'%(apiUrl,lang,offSet)
+    url = '%svoot-web/content/generic/movies-by-language?language=include:%s&sort=mostpopular:desc&&page=%s&responseType=common'%(apiUrl,lang,offSet)
     jd = requests.get(url,headers=headers).json()        
     items = jd['result']
     #web_pdb.set_trace()
@@ -585,7 +607,7 @@ def list_episodes(show,offSet,sicon):
         is_folder = False
         if 'Next Page' not in title:
             list_item.setProperty('IsPlayable', 'true')
-            url = '{0}?action=play&video={1}'.format(_url, eid)
+            url = '{0}?action=play&video={1}&quality={2}'.format(_url, eid,'DASHENC_PREMIUMHD')
         else:
             url = '{0}?action=list_show&show={1}&offSet={2}&totals={3}&icon={4}'.format(_url,show,eid,totals,sicon)
             is_folder = True        
@@ -608,7 +630,7 @@ def list_extra(offSet):
         is_folder = False
         if 'Next Page' not in title:
             list_item.setProperty('IsPlayable', 'true')
-            url = '{0}?action=play&video={1}'.format(_url, eid)
+            url = '{0}?action=play&video={1}&quality={2}'.format(_url, eid,'DASHENC_PREMIUMHD')
         else:
             url = '{0}?action=list_extra&&offSet={1}'.format(_url,eid)
             is_folder = True        
@@ -652,7 +674,7 @@ def list_movies(lang,offSet,totals):
         is_folder = False
         if 'Next Page' not in title:
             list_item.setProperty('IsPlayable', 'true')
-            url = '{0}?action=play&video={1}'.format(_url, mid)
+            url = '{0}?action=play&video={1}&quality={2}'.format(_url, mid,'DASHENC_PREMIUMHD')
         else:
             url = '{0}?action=list_movies&lang={1}&offSet={2}&totals={3}'.format(_url, lang, mid, totals)
             is_folder = True
@@ -677,9 +699,9 @@ def list_live(offSet):
                 (u'Colors Marathi', u'http://v3img.voot.com/v3Storage/channel-logos/COLORS_MARATHI.png', u'793930', {'genre': [u'Drama'], 'mediatype': 'movie', 'title': u'Colors Marathi'}),
                 (u'Shemaroo TV', u'http://v3img.voot.com/v3Storage/channel-logos/Shemaroo-TV-logo-500x500.png', u'981709', {'genre': [], 'mediatype': 'movie', 'title': u'Shemaroo TV'}),
                 (u'Shemaroo Marathi Bana', u'http://v3img.voot.com/v3Storage/channel-logos/MarathiBana_With-tagline-500x500.png', u'981710', {'genre': [], 'mediatype': 'movie', 'title': u'Shemaroo Marathi Bana'}),
-                (u'Sonic', u'https://v3img.voot.com/resizeMedium,w_100,h_100/v3Storage/assets/Sonic-1580278480683.jpg', u'708552', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Sonic'}),
-                (u'Nick Jr', u'https://v3img.voot.com/resizeMedium,w_100,h_100/v3Storage/assets/Nick-Jr-1580292600144.jpg', u'553909', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Nick Jr'}),  
-                (u'Nick HD+', u'https://v3img.voot.com/resizeMedium,w_100,h_100/v3Storage/assets/Nick-1580278662856.jpg', u'639070', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Nick HD+'}),    
+                (u'Sonic', u'https://v3img.voot.com/resizeMedium,w_221,h_125/v3Storage/assets/Live-Tv-Channels-nick-sonic-1606037274998.jpg', u'708552', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Sonic'}),
+                (u'Nick Jr', u'https://v3img.voot.com/resizeMedium,w_221,h_125/v3Storage/assets/Live-Tv-Channels-nick-jr-1606037359082.jpg', u'553909', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Nick Jr'}),  
+                (u'Nick HD+', u'https://v3img.voot.com/resizeMedium,w_362,h_204/v3Storage/assets/Live-Tv-Channels-nick-hd-1606037295995.jpg', u'639070', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'Nick HD+'}),    
                 (u'DD National', u'http://v3img.voot.com/v3Storage/channel-logos/DD-national-test.png', u'966639', {'genre': [u'Education'], 'mediatype': 'movie', 'title': u'DD National'}), 
                ]
 
@@ -693,7 +715,7 @@ def list_live(offSet):
         is_folder = False
         if 'Next Page' not in title:
             list_item.setProperty('IsPlayable', 'true')
-            url = '{0}?action=play&video={1}'.format(_url, mid)
+            url = '{0}?action=play&video={1}&quality={2}'.format(_url, mid,'DASH_LINEAR_APP')
         else:
             url = '{0}?action=Live&offSet={1}'.format(_url, mid)
             is_folder = True
@@ -705,17 +727,39 @@ def list_live(offSet):
 
 
 
-def play_video(path, strqual):
+def play_video(urlid, quality):
     """
     Play a video by the provided path.
 
     """
+    #
+    license=getlicense(urlid)
 
-    license=getlicense(path)
+    if quality=='DASHENC_PREMIUMHD':
+	    url = '%svoot-web/asset/%s?responseType=playback_new&playbackType=DASHENC_PREMIUMHD'%(apiUrl,urlid)
+	    jd = requests.get(url, headers=headers).json()
 
+	    stream_url=jd['result'][0]['profileUrls'][0]['profileUrl']
+    else:
+		url = 'https://apiv2.voot.com/wsv_2_3/playBack.json?mediaId=%s'%(urlid)
+		jd = requests.get(url, headers=headers).json()
+		files = jd['assets'][0]['assets'][0]['items'][0]['files']
+		if license=="":
+			urlquality='HLS_Linear_P'
+		else:
+			urlquality='DASH_LINEAR_APP'
+		for file in files:
+			if file.get('Format') == urlquality:
+				stream_url = file.get('URL')
+				break
+
+    #web_pdb.set_trace()
+    play_item = xbmcgui.ListItem(path=stream_url)
+    play_item.setPath(stream_url)
+
+    """
     play_item = xbmcgui.ListItem(path=path)
     vid_link = play_item.getfilename()
-
     url = 'https://apiv2.voot.com/wsv_2_3/playBack.json?mediaId=%s'%(vid_link)
     jd = requests.get(url, headers=headers).json()        
     files = jd['assets'][0]['assets'][0]['items'][0]['files']
@@ -740,8 +784,7 @@ def play_video(path, strqual):
 
     if _settings('EnableIP') == 'true':
         stream_url += '&X-Forwarded-For=%s'%_settings('ipaddress')
-
-    play_item.setPath(stream_url)
+	"""
 
     play_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
 
